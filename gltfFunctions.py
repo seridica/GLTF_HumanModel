@@ -4,17 +4,20 @@ Created on Thu Jun 20 23:16:21 2019
 
 @author: Calvin
 """
-###
-# Imports
-###
+
+"""
+Imports
+"""
 import pygltflib as pygltf
 from base64 import b64decode, b64encode
 import numpy as np
 from RotationFunctions import *
 import struct
 
-###
-###
+"""
+Generate the Joint Map for gltf skeleton (same as joint map for motion capture
+or modeling frameworks)
+"""
 def getGltfJointMap():
     eye3 = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])
     
@@ -75,105 +78,107 @@ def getGltfJointMap():
 # Function converts a mocap dictionary into a gltf data dictionary given the
 # motion capture parameters
 ###
-def mocap2gltf(mocapDict, mocapParams):
+def mocap2gltf(mocapDict):
     
     gltfDict = {}
     
     # Get global rotation
-    globalRotation = mvnParams['globalRotation']
+    globalRotation = mocapDict['globalRotation']
     
     # Get gltf joint angle mapping -> gltf joint angles are not consistent
     gltfJointMap = getGltfJointMap()
     
+    # Get the time vector
+    gltfDict['Time'] = mocapDict['Time']
+    
     # Go through data structure and convert joint names to gltf joint names
     # and convert rotations to quaternions
-    mocap_keys = list( mocapDict.keys() )
-    jointMap = mocapParams['jointMap']
+    jointMap = mocapDict['jointMap']
     jointMap_keys = list( jointMap.keys() )
-    for i in range( len( mocap_keys ) ):
+    for i in range( len( jointMap_keys ) ):
         
         # Time vector should not need to change
-        print(mocap_keys[i])
-        if mocap_keys[i] == 'Time':
-            gltfDict[mocap_keys[i]] = mocapDict[mocap_keys[i]]
-        elif "_trans" in mocap_keys[i]:
-            jointName = mocap_keys[i]
+        print(jointMap_keys[i])
+        if "_trans" in jointMap_keys[i]:
+            jointName = jointMap_keys[i]
             
-            # Mapping exists for this joint
-            if jointName in jointMap_keys:
+            gltf_name = jointMap[jointName]['gltf']
                 
-                # Get the gltf name
-                gltf_name = jointMap[jointName]['gltf']
+            # Get various time invariant rotation matrices
+            zoff = jointMap[jointName]['offset']
+            prox_mocap = jointMap[jointName]['Rprox']
+            rot_gltf = gltfJointMap[gltf_name]
+            
+            # Compute pre- and post-rotation matric multipliers
+            prox_offset = np.matmul( rot_gltf.transpose(), np.matmul(globalRotation, prox_mocap) );
                 
-                # Get the zero offset
-                zoff = jointMap[jointName]['offset']
+            # Convert data
+            frame_data = jointMap[jointName]['data']
+            nFrames = frame_data.shape[0]
+            gltfData = np.empty([nFrames, 3])
+            for j in range(nFrames):
+                mocap_frame = frame_data[j,:]
                 
-                # Total offset is global + zero offset
-                #total_offset = quatmult( zoff, globalRotation )
-                #total_offset = np.matmul( zoff, globalRotation )
-                total_offset = globalRotation
-                
-                # Convert data
-                frame_data = mocapDict[jointName]
-                nFrames = frame_data.shape[0]
-                gltfData = np.empty([nFrames, 3])
-                for j in range(nFrames):
-                    mocap_frame = frame_data[j,:]
+                # Euler ZXY to quaternion
+                if jointMap[jointName]['dattype'] == 'pos':
+                    #new_frame = np.matmul( gltfJointMap[gltf_name], np.array([mocap_frame]).transpose() )
+                    pos = mocap_frame
                     
-                    # Euler ZXY to quaternion
-                    if jointMap[jointName]['rottype'] == 'pos':
-                        #new_frame = np.matmul( gltfJointMap[gltf_name], np.array([mocap_frame]).transpose() )
-                        pos = mocap_frame
-                        
-                    gltf_global_rot = np.matmul( total_offset, gltfJointMap[gltf_name] )
-                    adj_link_pos = np.matmul(zoff, pos)
-                    gltf_link_pos = np.matmul( gltf_global_rot.transpose(), adj_link_pos )
-                    gltfData[j,:] = gltf_link_pos
-                
-                gltfDict[gltf_name] = gltfData
+                # Compute the position
+                gltf_global_rot = np.matmul( gltfJointMap[gltf_name], prox_offset )
+                gltf_link_pos = np.matmul( gltf_global_rot, pos )
+                gltfData[j,:] = gltf_link_pos
+            
+            gltfDict[gltf_name] = gltfData
         else:
-            jointName = mocap_keys[i]
+            jointName = jointMap_keys[i]
             
-            # Mapping exists for this joint
-            if jointName in jointMap_keys:
+            # Get the gltf name
+            gltf_name = jointMap[jointName]['gltf']
+            
+            # Get the zero offset
+            zoff = jointMap[jointName]['offset']
+            
+            # Get various time invariant rotation matrices
+            zoff = jointMap[jointName]['offset']
+            prox_mocap = jointMap[jointName]['Rprox']
+            dist_mocap = jointMap[jointName]['Rdist']
+            rot_gltf = gltfJointMap[gltf_name]
+            
+            # Compute pre- and post-rotation matric multipliers
+            prox_offset = np.matmul( rot_gltf.transpose(), np.matmul(globalRotation, prox_mocap) );
+            dist_offset = np.matmul( dist_mocap.transpose(), np.matmul(globalRotation.transpose(), rot_gltf));
+            
+            # Convert data
+            frame_data = jointMap[jointName]['data']
+            nFrames = frame_data.shape[0]
+            gltfData = np.empty([nFrames, 4])
+            for j in range(nFrames):
+                mocap_frame = frame_data[j,:]
                 
-                # Get the gltf name
-                gltf_name = jointMap[jointName]['gltf']
+                # Euler ZXY to quaternion
+                if jointMap[jointName]['dattype'] == 'ZXY':
+                    #new_frame = np.matmul( gltfJointMap[gltf_name], np.array([mocap_frame]).transpose() )
+                    rotmat = EulerZXY(mocap_frame)
+                    #rotmat = EulerZXY(new_frame.transpose().tolist()[0])
+                    #quat = rot2quat(rotmat)
+                if jointMap[jointName]['dattype'] == 'LZXY':
+                    #new_frame = np.matmul( gltfJointMap[gltf_name], np.array([mocap_frame]).transpose() )
+                    rotmat = EulerLZXY(mocap_frame)
+                    #rotmat = EulerZXY(new_frame.transpose().tolist()[0])
+                    #quat = rot2quat(rotmat)
+                if jointMap[jointName]['dattype'] == 'quat':
+                    rotmat = quat2rot(mocap_frame)
+                if jointMap[jointName]['dattype'] == 'rotmat':
+                    rotmat = genRotMat(mocap_frame)
                 
-                # Get the zero offset
-                zoff = jointMap[jointName]['offset']
-                
-                # Total offset is global + zero offset
-                #total_offset = quatmult( zoff, globalRotation )
-                #total_offset = np.matmul( zoff, globalRotation )
-                total_offset = globalRotation
-                
-                # Convert data
-                frame_data = mocapDict[jointName]
-                nFrames = frame_data.shape[0]
-                gltfData = np.empty([nFrames, 4])
-                for j in range(nFrames):
-                    mocap_frame = frame_data[j,:]
-                    
-                    # Euler ZXY to quaternion
-                    if jointMap[jointName]['rottype'] == 'ZXY':
-                        #new_frame = np.matmul( gltfJointMap[gltf_name], np.array([mocap_frame]).transpose() )
-                        rotmat = EulerZXY(mocap_frame)
-                        #rotmat = EulerZXY(new_frame.transpose().tolist()[0])
-                        #quat = rot2quat(rotmat)
-                    if jointMap[jointName]['rottype'] == 'quat':
-                        rotmat = quat2rot(mocap_frame)
-                    
-                    #gltf_global_rot = np.matmul( total_offset, gltfJointMap[gltf_name] )
-                    #gltf_link_rot = np.matmul( gltf_global_rot.transpose(), np.matmul( rotmat, gltf_global_rot ) )
-                    #gltfData[j,:] = rot2quat( gltf_link_rot )
-                    
-                    gltf_global_rot = np.matmul( total_offset, gltfJointMap[gltf_name] )
-                    adj_link_rot = np.matmul(zoff, rotmat)
-                    gltf_link_rot = np.matmul( gltf_global_rot.transpose(), np.matmul( adj_link_rot, gltf_global_rot ) )
-                    gltfData[j,:] = rot2quat( gltf_link_rot )
-                
-                gltfDict[gltf_name] = gltfData
+                # Compute the orientation
+                prox_offset_rot = np.matmul( prox_offset, zoff )
+                dist_motion_rot = np.matmul( rotmat, dist_offset )
+                gltf_link_rot = np.matmul( prox_offset_rot, dist_motion_rot )
+                gltfData[j,:] = rot2quat( gltf_link_rot )
+            
+            gltfDict[gltf_name] = gltfData
     
     return gltfDict
 
@@ -378,11 +383,11 @@ def convertToBytes(arrayData):
 ###
 def main():
     filename_base = 'D:/Google Drive/UBC Postdoc/Full Skeletal Rig/SkinCap Rig/SkeletalRig_v1_5'
-    new_fname = filename_base + '_animated_jump.gltf'
+    new_fname = filename_base + '_animated.gltf'
     
     filename = filename_base + '.gltf'
     
-    gltfDict = mocap2gltf(mvnDict, mvnParams)
+    gltfDict = mocap2gltf(mvnDict)
     curr_gltf = pygltf.GLTF2().load(filename)
     new_gltf = addGltfAnimation(curr_gltf, gltfDict)
     new_gltf.save(new_fname)

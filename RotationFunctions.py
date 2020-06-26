@@ -84,7 +84,21 @@ def EulerXZY(xyz, d=1):
     xrot = np.array([[1.,0.,0.],[0.,np.cos(x),-np.sin(x)],[0.,np.sin(x),np.cos(x)]])
     yrot = np.array([[np.cos(y),0.,np.sin(y)],[0.,1.,0.],[-np.sin(y),0.,np.cos(y)]])
     zrot = np.array([[np.cos(z),-np.sin(z),0.],[np.sin(z),np.cos(z),0.],[0.,0.,1.]])
-    return np.matmul(zrot,np.matmul(xrot,yrot))
+    return np.matmul(xrot,np.matmul(zrot,yrot))
+
+def EulerYXZ(xyz, d=1):
+    if d==0:
+        x = xyz[0]
+        y = xyz[1]
+        z = xyz[2]
+    else:
+        x = xyz[0]*np.pi/180.
+        y = xyz[1]*np.pi/180.
+        z = xyz[2]*np.pi/180.
+    xrot = np.array([[1.,0.,0.],[0.,np.cos(x),-np.sin(x)],[0.,np.sin(x),np.cos(x)]])
+    yrot = np.array([[np.cos(y),0.,np.sin(y)],[0.,1.,0.],[-np.sin(y),0.,np.cos(y)]])
+    zrot = np.array([[np.cos(z),-np.sin(z),0.],[np.sin(z),np.cos(z),0.],[0.,0.,1.]])
+    return np.matmul(yrot,np.matmul(xrot,zrot))
 
 # Left-Handed Euler ZXY
 def EulerLZXY(xyz, d=1):
@@ -110,3 +124,83 @@ def quat2rot( quat ):
 def genRotMat( rm ):
     rot = np.array([[rm[0], rm[1], rm[2]],[rm[3], rm[4], rm[5]],[rm[6], rm[7], rm[8]]])
     return rot
+
+def fromRotMat( rot ):
+    rm = np.array([rot[0,0], rot[0,1], rot[0,2], rot[1,0], rot[1,1], rot[1,2], rot[2,0], rot[2,1], rot[2,2]])
+    return rm
+
+def rot2XZY( rot, d=1 ):
+    # Adapted from matlab code
+    x = np.arctan2( rot[2][1], rot[1][1] )
+    y = np.arctan2( rot[0][2], rot[0][0] )
+    z = np.arctan2( -rot[0][1], np.sqrt( rot[0][0] * rot[0][0] + rot[0][2] * rot[0][2] ) )
+    
+    if d == 0:
+        return np.array([x, y, z])
+    else:
+        return np.array([x,y,z]) * 180. / np.pi
+
+def rot2ZXY( rot, d=1 ):
+    x = np.arctan2( rot[2][1], np.sqrt( rot[2][0] * rot[2][0] + rot[2][2] * rot[2][2] ) )
+    y = np.arctan2( -rot[2][0], rot[2][2] )
+    z = np.arctan2( -rot[0][1], rot[1][1] )
+    
+    if d == 0:
+        return np.array([x, y, z])
+    else:
+        return np.array([x,y,z]) * 180. / np.pi
+    return
+
+def rot2YXZ( rot, d=1 ):
+    x = np.arctan2( -rot[1][2], np.sqrt( rot[0][2] * rot[0][2] + rot[2][2] * rot[2][2] ) )
+    y = np.arctan2( rot[0][2], rot[2][2] )
+    z = np.arctan2( rot[1][0], rot[1][1] )
+    
+    if d == 0:
+        return np.array([x, y, z])
+    else:
+        return np.array([x,y,z]) * 180. / np.pi
+    return
+
+def rot2LZXY( rot, d=1 ):
+    return -rot2ZXY(rot, d)
+
+
+###
+# Test functionality
+###
+def main():
+    xyz = np.random.rand(3) * 2*np.pi - np.pi
+    rot = EulerXZY(xyz,0)
+    print(rot)
+    
+    xyz_out = rot2XZY(rot, 0)
+    print(xyz)
+    print( xyz_out )
+    
+    rot = EulerZXY(xyz,0)
+    print(rot)
+    xyz_out = rot2ZXY(rot,0)
+    print(xyz)
+    print(xyz_out)
+    
+    rot = EulerYXZ(xyz,0)
+    print(rot)
+    xyz_out = rot2YXZ(rot,0)
+    print(xyz)
+    print(xyz_out)
+    
+    rot = EulerLZXY(xyz,0)
+    print(rot)
+    xyz_out = rot2LZXY(rot,0)
+    print(xyz)
+    print(xyz_out)
+    
+    print(rot)
+    qq = rot2quat(rot)
+    print(qq)
+    rot_out = quat2rot(qq)
+    print(rot_out)
+
+if __name__ == "__main__":
+    main()

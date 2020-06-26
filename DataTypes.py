@@ -13,9 +13,13 @@ def getDataTypes():
                      'nvars': 4},
             'ZXY': {'description': 'ZXY euler angles',
                        'nvars': 3},
+            'XZY': {'description': 'XZY euler angles',
+                       'nvars': 3},
             'LZXY': {'description': 'Left handed euler angles',
                      'nvars': 3},
             'angaxis': {'description': 'Angle axis',
-                       'nvars': 4}
+                       'nvars': 4},
+            'pos': {'description': 'Translation',
+                    'nvars': 3}
             }
     return data_types

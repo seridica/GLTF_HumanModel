@@ -11,6 +11,7 @@ Imports
 import xml.etree.ElementTree as etxml
 import numpy as np
 from RotationFunctions import *
+from constraintFunctions import *
 
 """
 Function for converting mvnx file into an mvn data dictionary
@@ -28,7 +29,11 @@ def mvnx2mvndict(mvnx_data, mvnDict):
     # Second level - Want the joint names and the frame data
     mvnx_level_two = list(subject_data)
     joint_names = [a.attrib['label'] for a in list( mvnx_level_two[3] )]
-    frame_data = mvnx_level_two[5]
+    for i in range(len(list(mvnx_level_two))):
+        if 'frames' in mvnx_level_two[i].tag:
+            frame_ind = i
+            
+    frame_data = mvnx_level_two[frame_ind]
     nFrames = len(frame_data) - 3
     
     # Get joint names that were present in the motion capture session and
@@ -137,18 +142,18 @@ def mvnJointMap():
     jointMap['jT1C7'] = {'gltf': 'C7', 'Rprox': R_spine, 'Rdist': R_spine, 'offset': zero_offset, 'dattype': 'LZXY'}
     jointMap['jC1Head'] = {'gltf': 'Skull', 'Rprox': R_spine, 'Rdist': R_spine, 'offset': zero_offset, 'dattype': 'LZXY'}
     jointMap['jRightT4Shoulder'] = {'gltf': 'Right Shoulder', 'Rprox': R_right_arm, 'Rdist': R_right_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jRightShoulder'] = {'gltf': 'Right Upper Arm', 'Rprox': R_right_arm, 'Rdist': R_right_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jRightElbow'] = {'gltf': 'Right Forearm', 'Rprox': R_right_arm, 'Rdist': R_right_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
+    jointMap['jRightShoulder'] = {'gltf': 'Right Upper Arm', 'Rprox': R_right_arm, 'Rdist': R_right_arm, 'offset': zero_offset, 'dattype': 'LZXY'}    
+    jointMap['jRightElbow'] = {'gltf': 'Right Forearm', 'Rprox': R_right_arm, 'Rdist': R_right_arm, 'offset': zero_offset, 'dattype': 'LZXY'}    
     jointMap['jRightWrist'] = {'gltf': 'Right Hand', 'Rprox': R_right_arm, 'Rdist': R_right_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
     jointMap['jLeftT4Shoulder'] = {'gltf': 'Left Shoulder', 'Rprox': R_left_arm, 'Rdist': R_left_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jLeftShoulder'] = {'gltf': 'Left Upper Arm', 'Rprox': R_left_arm, 'Rdist': R_left_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jLeftElbow'] = {'gltf': 'Left Forearm', 'Rprox': R_left_arm, 'Rdist': R_left_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
+    jointMap['jLeftShoulder'] = {'gltf': 'Left Upper Arm', 'Rprox': R_left_arm, 'Rdist': R_left_arm, 'offset': zero_offset, 'dattype': 'LZXY'}    
+    jointMap['jLeftElbow'] = {'gltf': 'Left Forearm', 'Rprox': R_left_arm, 'Rdist': R_left_arm, 'offset': zero_offset, 'dattype': 'LZXY'}    
     jointMap['jLeftWrist'] = {'gltf': 'Left Hand', 'Rprox': R_left_arm, 'Rdist': R_left_arm, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jRightHip'] = {'gltf': 'Right Femur', 'Rprox': R_right_leg, 'Rdist': R_right_leg, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jRightKnee'] = {'gltf': 'Right Shank', 'Rprox': R_right_knee, 'Rdist': R_right_knee, 'offset': zero_offset, 'dattype': 'ZXY'}
+    jointMap['jRightHip'] = {'gltf': 'Right Femur', 'Rprox': R_right_leg, 'Rdist': R_right_leg, 'offset': zero_offset, 'dattype': 'LZXY'}    
+    jointMap['jRightKnee'] = {'gltf': 'Right Shank', 'Rprox': R_right_knee, 'Rdist': R_right_knee, 'offset': zero_offset, 'dattype': 'ZXY'}    
     jointMap['jRightAnkle'] = {'gltf': 'Right Foot', 'Rprox': R_right_leg, 'Rdist': R_right_leg, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jLeftHip'] = {'gltf': 'Left Femur', 'Rprox': R_left_leg, 'Rdist': R_left_leg, 'offset': zero_offset, 'dattype': 'LZXY'}
-    jointMap['jLeftKnee'] = {'gltf': 'Left Shank', 'Rprox': R_left_knee, 'Rdist': R_left_knee, 'offset': zero_offset, 'dattype': 'ZXY'}
+    jointMap['jLeftHip'] = {'gltf': 'Left Femur', 'Rprox': R_left_leg, 'Rdist': R_left_leg, 'offset': zero_offset, 'dattype': 'LZXY'}    
+    jointMap['jLeftKnee'] = {'gltf': 'Left Shank', 'Rprox': R_left_knee, 'Rdist': R_left_knee, 'offset': zero_offset, 'dattype': 'ZXY'}    
     jointMap['jLeftAnkle'] = {'gltf': 'Left Foot', 'Rprox': R_left_leg, 'Rdist': R_left_leg, 'offset': zero_offset, 'dattype': 'LZXY'}
     jointMap['jPelvis'] = {'gltf': 'Pelvis', 'Rprox': R_pelvis, 'Rdist': R_pelvis, 'offset': zero_offset, 'dattype': 'quat'}
     jointMap['jPelvis_trans'] = {'gltf': 'Pelvis_trans', 'Rprox': R_pelvis, 'Rdist': R_pelvis, 'offset': zero_offset, 'dattype': 'pos'}
@@ -161,17 +166,55 @@ def mvnJointMap():
     return mvnMap
 
 """
+Main constraint function
+- Adjust this function to select what kind of constraints you want in the
+skeletal rig
+- It will call on the relevant helper functions to fill in the gaps
+"""
+def mvnConstraintMap():
+    constrMap = {}
+    
+    constrMap = FixedLegConstraint( constrMap, True )
+    constrMap = FixedLegConstraint( constrMap, False )
+    
+    #constrMap = FixedArmConstraint( constrMap, True )
+    constrMap = UlnarRadialArmConstraint( constrMap, True )
+    #constrMap = FixedArmConstraint( constrMap, False )
+    constrMap = UlnarRadialArmConstraint( constrMap, False )
+    
+    constrMap = CervicalSpineConstraint( constrMap )
+    constrMap = ThoracoLumbarSpineConstraint( constrMap, ['L5', 'L3', 'T12', 'T8'] )
+    
+    return constrMap
+
+def mvnSimpleConstraintMap():
+    constrMap = {};
+    constrMap = FixedLegConstraint( constrMap, True )
+    constrMap = FixedLegConstraint( constrMap, False )
+    constrMap = FixedArmConstraint( constrMap, True )
+    constrMap = FixedArmConstraint( constrMap, False )
+    
+    return constrMap
+
+def mvnInverseConstraintMap():
+    constrMap = {};
+    constrMap = InverseCervicalSpineConstraint( constrMap )
+    constrMap = InverseThoracoLumbarSpineConstraint( constrMap, ['L5', 'L3', 'T12', 'T8'])
+    return constrMap
+
+"""
 Sample code
 """
 def main():
     # Read xml data
     #filename = 'D:/UBC\Motion Reconstruction/Data\Animation Test/Subject01-002_withSensorData.mvnx'
-    #filename = 'D:/Google Drive/UBC Postdoc/Full Skeletal Rig/Xsens Files/summer_test1-001.mvnx'
-    filename = 'D:/UBC - Postdoc/Sensors/Full Skeletal Rig/MVN Samples/Subject05-001-jump_full.mvnx'
+    filename = 'D:/Google Drive/UBC Postdoc/Full Skeletal Rig/Xsens Files/summer_test1-001.mvnx'
+    #filename = 'D:/UBC - Postdoc/Sensors/Full Skeletal Rig/MVN Samples/Subject05-001-jump_full.mvnx'
     mvnx_data = etxml.parse(filename).getroot()
     
     # Get mvn parameters and create dictionary template
     mvnParams = mvnJointMap()
+    mvnParams['constraintMap'] = mvnConstraintMap()
     
     # Parse xml data and add to the mvn dictionary
     mvnDict = mvnx2mvndict(mvnx_data, mvnParams)

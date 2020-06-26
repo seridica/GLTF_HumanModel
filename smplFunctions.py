@@ -72,7 +72,6 @@ def smplJointMap(data_type):
     # Generate Joint map with time-invariant parameters - this is the full mapping, users can select subsets
     ###
     jointMap = {}
-    jointMap['Pelvis'] = {'gltf': 'Pelvis', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': data_type}
     jointMap['L_Hip'] = {'gltf': 'Left Femur', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': data_type}
     jointMap['R_Hip'] = {'gltf': 'Right Femur', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': data_type}
     jointMap['Spine1'] = {'gltf': 'L5', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': data_type}
@@ -92,6 +91,8 @@ def smplJointMap(data_type):
     jointMap['R_Elbow'] = {'gltf': 'Right Forearm', 'Rprox': lshould_off, 'Rdist': lshould_off, 'offset': zero_offset, 'dattype': data_type}
     jointMap['L_Wrist'] = {'gltf': 'Left Hand', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': data_type}
     jointMap['R_Wrist'] = {'gltf': 'Right Hand', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': data_type}
+    jointMap['Pelvis'] = {'gltf': 'Pelvis', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': 'YXZ'}
+    jointMap['Pelvis_trans'] = {'gltf': 'Pelvis_trans', 'Rprox': zero_offset, 'Rdist': zero_offset, 'offset': zero_offset, 'dattype': 'pos'}
     
     # Global orientation
     globalOrient = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])

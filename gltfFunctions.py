@@ -28,27 +28,22 @@ def getGltfJointMap():
     jMap['Pelvis_trans'] = eye3;
     
     # Lower body mapping from GLTF global frame to individual joints
-    rFemur_rel = quat2rot( np.array([0.9999873042106628, 0, 0, -0.0050572361797094345]) / np.linalg.norm( np.array([0.9999873042106628, 0, 0, -0.0050572361797094345]) ) ).transpose()
-    rFemur_abs = rFemur_rel
-    jMap['Right Femur'] = rFemur_abs
-    
-    rShank_rel = quat2rot( np.array([2.2136126265337452e-10, 0.9999871850013733, -0.005064154975116253, -4.371083051069036e-08]) / np.linalg.norm( np.array([2.2136126265337452e-10, 0.9999871850013733, -0.005064154975116253, -4.371083051069036e-08]) ) ).transpose()
-    rShank_abs = np.matmul( rFemur_abs, rShank_rel )
+    jMap['Right Femur'] = np.array([[1.,0.,0.],[0.,-1.,0.],[0.,0.,-1.]])
+    rShank_abs = np.array([[-1.,0.,0.],[0.,-1.,0.],[0.,0.,1.]])
     jMap['Right Shank'] = rShank_abs
     jMap['Right Fibula'] = rShank_abs
     jMap['Right Tibia'] = rShank_abs
     jMap['Right Patella'] = rShank_abs
     
+    # Foot is quite off axis
     rFoot_rel = quat2rot( np.array([-5.1845829851515646e-09, 0.9005414247512817, 0.43477022647857666, 6.798898510851359e-08]) / np.linalg.norm(np.array([-5.1845829851515646e-09, 0.9005414247512817, 0.43477022647857666, 6.798898510851359e-08])) ).transpose()
     rFoot_abs = np.matmul( rFoot_rel, rShank_abs )
     jMap['Right Foot'] = rFoot_abs
     
-    lFemur_rel = quat2rot( np.array([0.9999873042106628, 0, 0, -0.0050572361797094345]) / np.linalg.norm( np.array([0.9999873042106628, 0, 0, -0.0050572361797094345]) ) ).transpose()
-    lFemur_abs = lFemur_rel
+    lFemur_abs = np.array([[1.,0.,0.],[0.,-1.,0.],[0.,0.,-1.]])
     jMap['Left Femur'] = lFemur_abs
     
-    lShank_rel = quat2rot( np.array([2.2136126265337452e-10, 0.9999871850013733, -0.005064154975116253, -4.371083051069036e-08]) / np.linalg.norm(np.array([2.2136126265337452e-10, 0.9999871850013733, -0.005064154975116253, -4.371083051069036e-08])) ).transpose()
-    lShank_abs = np.matmul( lShank_rel, lFemur_abs )
+    lShank_abs = np.array([[-1.,0.,0.],[0.,-1.,0.],[0.,0.,1.]])
     jMap['Left Shank'] = lShank_abs
     jMap['Left Fibula'] = lShank_abs
     jMap['Left Tibia'] = lShank_abs
@@ -59,142 +54,54 @@ def getGltfJointMap():
     jMap['Left Foot'] = lFoot_abs
     
     # Spine mapping from GLTF global frame to individual joints
-    L5_rel = quat2rot( np.array([0.1822359561920166, 0, 0, 0.9832548499107361]) / np.linalg.norm(np.array([0.1822359561920166, 0, 0, 0.9832548499107361])) ).transpose()
-    L5_abs = L5_rel
-    jMap['L5'] = L5_abs
-    
-    L4_rel = quat2rot( np.array([-0.15643492341041565, 0, 0, 0.9876883625984192]) / np.linalg.norm(np.array([-0.15643492341041565, 0, 0, 0.9876883625984192])) ).transpose()
-    L4_abs = np.matmul( L4_rel, L5_abs )
-    jMap['L4'] = L4_abs
-    
-    L3_rel = quat2rot( np.array([-0.10452868044376373, 0, 0, 0.994521975517273]) / np.linalg.norm( np.array([-0.10452868044376373, 0, 0, 0.994521975517273]) ) ).transpose()
-    L3_abs = np.matmul( L3_rel, L4_abs )
-    jMap['L3'] = L3_abs
-    
-    L2_rel = quat2rot( np.array([-0.061046961694955826, 0, 0, 0.9981349110603333]) / np.linalg.norm( np.array([-0.061046961694955826, 0, 0, 0.9981349110603333]) ) ).transpose()
-    L2_abs = np.matmul( L2_rel, L3_abs )
-    jMap['L2'] = L2_abs
-    
-    L1_rel = quat2rot( np.array([-0.05233613774180412, 0, 0, 0.9986295104026794]) / np.linalg.norm( np.array([-0.05233613774180412, 0, 0, 0.9986295104026794]) ) ).transpose()
-    L1_abs = np.matmul( L1_rel, L2_abs )
-    jMap['L1'] = L1_abs
-    
-    T12_rel = quat2rot( np.array([0.017452172935009003, 0, 0, 0.9998477101325989]) / np.linalg.norm( np.array([0.017452172935009003, 0, 0, 0.9998477101325989]) ) ).transpose()
-    T12_abs = np.matmul( T12_rel, L1_abs )
-    jMap['T12'] = T12_abs
-    
-    T11_rel = quat2rot( np.array([0.03489987179636955, 0, 0, 0.9993908405303955]) / np.linalg.norm( np.array([0.03489987179636955, 0, 0, 0.9993908405303955]) ) ).transpose()
-    T11_abs = np.matmul( T11_rel, T12_abs )
-    jMap['T11'] = T11_abs
-    
-    T10_rel = quat2rot( np.array([0.043619077652692795, 0, 0, 0.9990482330322266]) / np.linalg.norm( np.array([0.043619077652692795, 0, 0, 0.9990482330322266]) ) ).transpose()
-    T10_abs = np.matmul( T10_rel, T11_abs )
-    jMap['T10'] = T10_abs
-    
-    T9_rel = quat2rot( np.array([0.03489937260746956, 0, 0, 0.9993908405303955]) / np.linalg.norm( np.array([0.03489937260746956, 0, 0, 0.9993908405303955]) ) ).transpose()
-    T9_abs = np.matmul( T9_rel, T10_abs )
-    jMap['T9'] = T9_abs
-    
-    T8_rel = quat2rot( np.array([0.043619345873594284, 0, 0, 0.9990482330322266]) / np.linalg.norm( np.array([0.043619345873594284, 0, 0, 0.9990482330322266]) ) ).transpose()
-    T8_abs = np.matmul( T8_rel, T9_abs )
-    jMap['T8'] = T8_abs
-    
-    T7_rel = quat2rot( np.array([0.05233614891767502, 0, 0, 0.9986295104026794]) / np.linalg.norm( np.array([0.05233614891767502, 0, 0, 0.9986295104026794]) ) ).transpose()
-    T7_abs = np.matmul( T7_rel, T8_abs )
-    jMap['T7'] = T7_abs
-    
-    T6_rel = quat2rot( np.array([0.0523357130587101, 0, 0, 0.9986295700073242]) / np.linalg.norm( np.array([0.0523357130587101, 0, 0, 0.9986295700073242]) ) ).transpose()
-    T6_abs = np.matmul( T6_rel, T7_abs )
-    jMap['T6'] = T6_abs
-    
-    T5_rel = quat2rot( np.array([0.05233645439147949, 0, 0, 0.9986295104026794]) / np.linalg.norm( np.array([0.05233645439147949, 0, 0, 0.9986295104026794]) ) ).transpose()
-    T5_abs = np.matmul( T5_rel, T6_abs )
-    jMap['T5'] = T5_abs
-    
-    T4_rel = quat2rot( np.array([0.05233585461974144, 0, 0, 0.9986295700073242]) / np.linalg.norm( np.array([0.05233585461974144, 0, 0, 0.9986295700073242]) ) ).transpose()
-    T4_abs = np.matmul( T4_rel, T5_abs )
-    jMap['T4'] = T4_abs
-    
-    T3_rel = quat2rot( np.array([0.03489944711327553, 0, 0, 0.9993908405303955]) / np.linalg.norm( np.array([0.03489944711327553, 0, 0, 0.9993908405303955]) ) ).transpose()
-    T3_abs = np.matmul( T3_rel, T4_abs )
-    jMap['T3'] = T3_abs
-    
-    T2_rel = quat2rot( np.array([0.026180002838373184, 0, 0, 0.9996572732925415]) / np.linalg.norm( np.array([0.026180002838373184, 0, 0, 0.9996572732925415]) ) ).transpose()
-    T2_abs = np.matmul( T2_rel, T3_abs )
-    jMap['T2'] = T2_abs
-    
-    T1_rel = quat2rot( np.array([-0.1533840447664261, 0, 0, 0.9881667494773865]) / np.linalg.norm( np.array([-0.1533840447664261, 0, 0, 0.9881667494773865]) ) ).transpose()
-    T1_abs = np.matmul( T1_rel, T2_abs )
-    jMap['T1'] = T1_abs
-    
-    C7_rel = quat2rot( np.array([0.07174857705831528, 0, 0, 0.9974227547645569]) / np.linalg.norm( np.array([0.07174857705831528, 0, 0, 0.9974227547645569]) ) ).transpose()
-    C7_abs = np.matmul( C7_rel, T1_abs )
-    jMap['C7'] = C7_abs
-    
-    C6_rel = quat2rot( np.array([-0.15467779338359833, 0, 0, 0.9879649877548218]) / np.linalg.norm( np.array([-0.15467779338359833, 0, 0, 0.9879649877548218]) ) ).transpose()
-    C6_abs = np.matmul( C6_rel, C7_abs )
-    jMap['C6'] = C6_abs
-    
-    C5_rel = quat2rot( np.array([0.07189929485321045, 0, 0, 0.9974119067192078]) / np.linalg.norm( np.array([0.07189929485321045, 0, 0, 0.9974119067192078]) ) ).transpose()
-    C5_abs = np.matmul( C5_rel, C6_abs )
-    jMap['C5'] = C5_abs
-    
-    C4_rel = quat2rot( np.array([-0.024355802685022354, 0, 0, 0.9997034668922424]) / np.linalg.norm( np.array([-0.024355802685022354, 0, 0, 0.9997034668922424]) ) ).transpose()
-    C4_abs = np.matmul( C4_rel, C5_abs )
-    jMap['C4'] = C4_abs
-    
-    C3_rel = quat2rot( np.array([-0.044016335159540176, 0, 0, 0.9990308284759521]) / np.linalg.norm( np.array([-0.044016335159540176, 0, 0, 0.9990308284759521]) ) ).transpose()
-    C3_abs = np.matmul( C3_rel, C4_abs )
-    jMap['C3'] = C3_abs
-    
-    C2_rel = quat2rot( np.array([0.0032729662489145994, 0, 0, 0.9999946355819702]) / np.linalg.norm( np.array([0.0032729662489145994, 0, 0, 0.9999946355819702]) ) ).transpose()
-    C2_abs = np.matmul( C2_rel, C3_abs)
-    jMap['C2'] = C2_abs
-    
-    C1_rel = quat2rot( np.array([-0.41500023007392883, 0, 0, 0.9098213315010071]) / np.linalg.norm( np.array([-0.41500023007392883, 0, 0, 0.9098213315010071]) ) ).transpose()
-    C1_abs = np.matmul( C1_rel, C2_abs )
-    jMap['C1'] = C1_abs
-    
-    skull_rel = quat2rot( np.array([0.3944814205169678, 0, 0, 0.9189039468765259]) / np.linalg.norm( np.array([0.3944814205169678, 0, 0, 0.9189039468765259]) ) ).transpose()
-    skull_abs = np.matmul( skull_rel, C1_abs )
-    jMap['Skull'] = skull_abs
+    jMap['L5'] = eye3
+    jMap['L4'] = eye3
+    jMap['L3'] = eye3
+    jMap['L2'] = eye3
+    jMap['L1'] = eye3
+    jMap['T12'] = eye3
+    jMap['T11'] = eye3
+    jMap['T10'] = eye3
+    jMap['T9'] = eye3
+    jMap['T8'] = eye3
+    jMap['T7'] = eye3
+    jMap['T6'] = eye3
+    jMap['T5'] = eye3
+    jMap['T4'] = eye3
+    jMap['T3'] = eye3
+    jMap['T2'] = eye3
+    jMap['T1'] = eye3
+    jMap['C7'] = eye3
+    jMap['C6'] = eye3
+    jMap['C5'] = eye3
+    jMap['C4'] = eye3
+    jMap['C3'] = eye3
+    jMap['C2'] = eye3
+    jMap['C1'] = eye3
+    jMap['Skull'] = eye3
     
     # Arms
-    lShoulder_rel = quat2rot( np.array([-0.15792852640151978, 0.07429691404104233, -0.7473743557929993, 0.6410695314407349]) / np.linalg.norm(np.array([-0.15792852640151978, 0.07429691404104233, 0.7473743557929993, 0.6410695314407349])) ).transpose()
-    lShoulder_abs = np.matmul( lShoulder_rel, T1_abs )
-    jMap['Left Shoulder'] = lShoulder_abs
-    
-    lUpper_rel = quat2rot( np.array([-1.9840220133460207e-08, 0.09373736381530762, -0.6535478830337524, 0.7510582208633423]) / np.linalg.norm( np.array([-1.9840220133460207e-08, 0.09373736381530762, -0.6535478830337524, 0.7510582208633423]) ) ).transpose()
-    lUpper_abs = np.matmul( lUpper_rel, lShoulder_abs )
-    jMap['Left Upper Arm'] = lUpper_abs
-    
-    lFore_rel = quat2rot( np.array([7.450580152834618e-09, 1.4901160305669237e-08, -1.862645149230957e-09, 1]) / np.linalg.norm( np.array([7.450580152834618e-09, 1.4901160305669237e-08, -1.862645149230957e-09, 1]) ) ).transpose()
-    lFore_abs = np.matmul( lFore_rel, lUpper_abs )
+    jMap['Left Shoulder'] = np.array([[0.,-1.,0.],[1.,0.,0.],[0.,0.,1.]])
+    jMap['Left Upper Arm'] = np.array([[-1.,0.,0.],[0.,-1.,0.],[0.,0.,1.]])
+    lFore_abs = np.array([[-1.,0.,0.],[0.,-1.,0.],[0.,0.,1.]])#np.matmul( lFore_rel, lUpper_abs )
     jMap['Left Forearm'] = lFore_abs
     jMap['Left Radius'] = lFore_abs
     jMap['Left Ulna'] = lFore_abs
+    jMap['Left Forearm_trans'] = lFore_abs
+    jMap['Left Radius_trans'] = lFore_abs
+    jMap['Left Ulna_trans'] = lFore_abs
+    jMap['Left Hand'] = np.array([[0.,0.,1.],[0.,-1.,0.],[1.,0.,0.]])
     
-    lHand_rel = quat2rot( np.array([-1.1294776669501516e-07, -0.6272183656692505, 0.0764044001698494, 0.7750867605209351]) / np.linalg.norm( np.array([-1.1294776669501516e-07, -0.6272183656692505, 0.0764044001698494, 0.7750867605209351]) ) ).transpose()
-    lHand_abs = np.matmul( lHand_rel, lFore_abs )
-    jMap['Left Hand'] = lHand_abs
-    
-    rShoulder_rel = quat2rot( np.array([-0.15792852640151978, -0.07429691404104233, 0.7473743557929993, 0.6410695314407349]) / np.linalg.norm( np.array([-0.15792852640151978, -0.07429691404104233, -0.7473743557929993, 0.6410695314407349]) ) ).transpose()
-    rShoulder_abs = np.matmul( rShoulder_rel, T1_abs )
-    jMap['Right Shoulder'] = rShoulder_abs
-    
-    rUpper_rel = quat2rot( np.array([-1.9840220133460207e-08, -0.09373736381530762, 0.6535478830337524, 0.7510582208633423]) / np.linalg.norm( np.array([-1.9840220133460207e-08, -0.09373736381530762, 0.6535478830337524, 0.7510582208633423]) ) ).transpose()
-    rUpper_abs = np.matmul( rUpper_rel, rShoulder_abs )
-    jMap['Right Upper Arm'] = rUpper_abs
-    
-    rFore_rel = quat2rot( np.array([7.450580152834618e-09, -1.4901160305669237e-08, 1.862645149230957e-09, 1]) / np.linalg.norm( np.array([7.450580152834618e-09, -1.4901160305669237e-08, 1.862645149230957e-09, 1]) ) ).transpose()
-    rFore_abs = np.matmul( rFore_rel, rUpper_abs )
+    jMap['Right Shoulder'] = np.array([[0.,-1.,0.],[1.,0.,0.],[0.,0.,1.]])
+    jMap['Right Upper Arm'] = np.array([[-1.,0.,0.],[0.,-1.,0.],[0.,0.,1.]])
+    rFore_abs = np.array([[-1.,0.,0.],[0.,-1.,0.],[0.,0.,1.]])#np.matmul( rFore_rel, rUpper_abs )
     jMap['Right Forearm'] = rFore_abs
     jMap['Right Radius'] = rFore_abs
     jMap['Right Ulna'] = rFore_abs
-    
-    rHand_rel = quat2rot( np.array([-9.37226332098362e-08, -0.6272185444831848, 0.07640440762042999, 0.7750866413116455]) / np.linalg.norm( np.array([-9.37226332098362e-08, 0.6272185444831848, -0.07640440762042999, 0.7750866413116455]) ) )
-    rHand_abs = np.matmul( rHand_rel, rFore_abs )
-    jMap['Right Hand'] = rHand_abs
+    jMap['Right Forearm_trans'] = rFore_abs
+    jMap['Right Radius_trans'] = rFore_abs
+    jMap['Right Ulna_trans'] = rFore_abs
+    jMap['Right Hand'] = np.array([[0.,0.,-1.],[0.,-1.,0.],[-1.,0.,0.]])
     
     return jMap
 
@@ -204,6 +111,8 @@ def getGltfJointMap():
 # capture parameters
 ###
 def convertMocap(mocapDict):
+    
+    print("Converting MOCAP to global frame Anatomical")
     
     gltfDict = {}
     
@@ -223,7 +132,6 @@ def convertMocap(mocapDict):
     for i in range( len( jointMap_keys ) ):
         
         # Time vector should not need to change
-        print(jointMap_keys[i])
         if "_trans" in jointMap_keys[i]:
             jointName = jointMap_keys[i]
             
@@ -232,10 +140,9 @@ def convertMocap(mocapDict):
             # Get various time invariant rotation matrices
             zoff = jointMap[jointName]['offset']
             prox_mocap = jointMap[jointName]['Rprox']
-            rot_gltf = gltfJointMap[gltf_name]
             
             # Compute pre- and post-rotation matric multipliers
-            prox_offset = np.matmul( rot_gltf.transpose(), np.matmul(globalRotation, prox_mocap) );
+            prox_offset = np.matmul(globalRotation, prox_mocap);
                 
             # Convert data
             frame_data = jointMap[jointName]['data']
@@ -250,8 +157,7 @@ def convertMocap(mocapDict):
                     pos = mocap_frame
                     
                 # Compute the position
-                gltf_global_rot = np.matmul( gltfJointMap[gltf_name], prox_offset )
-                gltf_link_pos = np.matmul( gltf_global_rot, pos )
+                gltf_link_pos = np.matmul( prox_offset, pos )
                 gltfData[j,:] = gltf_link_pos
             
             gltfDict[gltf_name] = gltfData
@@ -268,11 +174,10 @@ def convertMocap(mocapDict):
             zoff = jointMap[jointName]['offset']
             prox_mocap = jointMap[jointName]['Rprox']
             dist_mocap = jointMap[jointName]['Rdist']
-            rot_gltf = gltfJointMap[gltf_name]
             
             # Compute pre- and post-rotation matric multipliers
-            prox_offset = np.matmul( rot_gltf.transpose(), np.matmul(globalRotation, prox_mocap) );
-            dist_offset = np.matmul( dist_mocap.transpose(), np.matmul(globalRotation.transpose(), rot_gltf));
+            prox_offset = np.matmul(globalRotation, prox_mocap);
+            dist_offset = np.matmul( dist_mocap.transpose(), globalRotation.transpose());
             
             # Convert data
             frame_data = jointMap[jointName]['data']
@@ -323,6 +228,8 @@ def convertMocap(mocapDict):
 ###
 def constraintMocap(mocapDict, indepDict, constrName='constraintMap'):
     
+    print("Applying Constraints")
+    
     depDict = {}
     nFrames = indepDict['Time'].shape[0]
         
@@ -331,7 +238,6 @@ def constraintMocap(mocapDict, indepDict, constrName='constraintMap'):
     for i in range( len( constrMap_keys ) ):
         
         # Time vector should not need to change
-        print(constrMap_keys[i])
         
         # What is the dependent joint
         dep_gltf_name = constrMap_keys[i]
@@ -431,17 +337,68 @@ def constraintMocap(mocapDict, indepDict, constrName='constraintMap'):
     return depDict
 
 ###
+# Function applies or removes the local rotation of joints in the gltf skeleton
+# from gltf global frame to the local joint frame. Can also go backwards to
+# support the inverse conversion
+###
+def applyGltfLocal(gltfDict, forward=1):
+    
+    print("Applying Local Anatomical Transformations")
+    
+    # Get the gltf joint angle mapping
+    gltfJointMap = getGltfJointMap()
+    
+    # Get the number of frames
+    nFrames = gltfDict['Time'].shape[0]
+    
+    # Get the joint keys
+    gltf_keys = list( gltfDict.keys() )
+            
+    # Cycle through joints
+    for i in range(1,len(gltf_keys)):
+        gltf_name = gltf_keys[i]
+    
+        # Get the forward or inverse transformation
+        rot_gltf = gltfJointMap[gltf_name]
+        if forward == 1:
+            appl_rot = rot_gltf.transpose()
+        else:
+            appl_rot = rot_gltf
+            
+        if "_trans" in gltf_keys[i]:
+            gltf_name = gltf_keys[i]
+            gltfData = gltfDict[gltf_name]
+            """
+            for j in range(nFrames):
+                gltfVec = gltfData[j,:]
+                newVec = np.matmul( appl_rot, gltfVec )
+                gltfData[j,:] = newVec
+            """
+        else:
+            gltf_name = gltf_keys[i]
+            gltfData = gltfDict[gltf_name]
+            
+            for j in range(nFrames):
+                gltfRot = quat2rot(gltfData[j,:])
+                newRot = np.matmul( np.matmul(appl_rot, gltfRot), appl_rot.transpose() )
+                gltfData[j,:] = rot2quat(newRot)
+                
+        # Update the data in the main dictionary
+        gltfDict[gltf_name] = gltfData
+        
+    return gltfDict
+
+###
 # Function converts a gltf data dictionary to mocap data representation given
 # the motion capture parameters provided in the mocapDict. Essentially the
 # reverse of convertMocap
 ###
 def convertGLTF(mocapDict, gltfDict):
     
+    print("Converting from global anatomical to motion capture")
+    
     # Get global rotation, invert it
     globalRotation = mocapDict['globalRotation']
-    
-    # Get gltf joint angle mapping -> gltf joint angles are not consistent
-    gltfJointMap = getGltfJointMap()
     
     # Get the time vector
     mocapDict['Time'] = gltfDict['Time']
@@ -453,7 +410,6 @@ def convertGLTF(mocapDict, gltfDict):
     for i in range( len( jointMap_keys ) ):
         
         # Time vector should not need to change
-        print(jointMap_keys[i])
         if "_trans" in jointMap_keys[i]:
             jointName = jointMap_keys[i]
             
@@ -462,10 +418,9 @@ def convertGLTF(mocapDict, gltfDict):
             # Get various time invariant rotation matrices
             zoff = jointMap[jointName]['offset']
             prox_mocap = jointMap[jointName]['Rprox']
-            rot_gltf = gltfJointMap[gltf_name]
             
             # Compute pre- and post-rotation matric multipliers
-            prox_offset = np.matmul( rot_gltf.transpose(), np.matmul(globalRotation, prox_mocap) );
+            prox_offset = np.matmul(globalRotation, prox_mocap);
               
             # Grab gltf data
             gltfData = gltfDict[gltf_name]
@@ -482,8 +437,7 @@ def convertGLTF(mocapDict, gltfDict):
                     pos = gltf_frame
                     
                 # Compute the position
-                gltf_global_rot = np.matmul( gltfJointMap[gltf_name], prox_offset )
-                mocap_link_pos = np.matmul( gltf_global_rot.transpose(), pos )
+                mocap_link_pos = np.matmul( prox_offset.transpose(), pos )
                 mocapData[j,:] = mocap_link_pos
             
             mocapDict['jointMap'][jointName]['data'] = mocapData
@@ -500,11 +454,10 @@ def convertGLTF(mocapDict, gltfDict):
             zoff = jointMap[jointName]['offset']
             prox_mocap = jointMap[jointName]['Rprox']
             dist_mocap = jointMap[jointName]['Rdist']
-            rot_gltf = gltfJointMap[gltf_name]
             
             # Compute pre- and post-rotation matric multipliers
-            prox_offset = np.matmul( rot_gltf.transpose(), np.matmul(globalRotation, prox_mocap) );
-            dist_offset = np.matmul( dist_mocap.transpose(), np.matmul(globalRotation.transpose(), rot_gltf));
+            prox_offset = np.matmul(globalRotation, prox_mocap);
+            dist_offset = np.matmul( dist_mocap.transpose(), globalRotation.transpose() );
             
             # Grab gltf data
             gltfData = gltfDict[gltf_name]
@@ -567,6 +520,9 @@ def mocap2gltf(mocapDict):
     ### Direct conversion of mocap to gltf
     gltfDict = convertMocap(mocapDict)
     
+    ### Rotate from gltf global to gltf local
+    gltfDict = applyGltfLocal(gltfDict, 1)
+    
     ### Generate constrained motion
     constraintDict = constraintMocap(mocapDict, gltfDict)
     
@@ -598,6 +554,9 @@ def gltf2mocap(mocapParams, gltfDict):
         # Add or replace in gltf motion dictionary
         gltfDict[dep_gltf_name] = constraintDict[dep_gltf_name]
     
+    ### Rotate gltf local to global
+    gltfDict = applyGltfLocal(gltfDict, 0)
+    
     ### Direct conversion of gltf to mocap
     mocapDict = convertGLTF(mocapParams, gltfDict)
     
@@ -607,8 +566,9 @@ def gltf2mocap(mocapParams, gltfDict):
 # Add animation data to existing skeletal rig
 ###
 def addGltfAnimation(gltfData, gltfDict):
+    print("Creating Animation")
+    
     nodeList = getGltfNodeNames( gltfData )
-    print( nodeList )
      
     # Create an empty buffer to store data
     new_buffer = bytes()
@@ -655,7 +615,6 @@ def addGltfAnimation(gltfData, gltfDict):
         # Only create blocks for joints
         if joint_name != 'Time':
             if '_trans' in joint_name:
-                print(joint_name)
                 
                 # Apply gltf rotation offset to joint data
                 joint_data_orig = gltfDict[joint_name]
@@ -702,8 +661,6 @@ def addGltfAnimation(gltfData, gltfDict):
                 jnt_channel.target = jnt_target
                 anim.channels.append(jnt_channel)
             else:
-                print(joint_name)
-                
                 # Apply gltf rotation offset to joint data
                 joint_data_orig = gltfDict[joint_name]
                 node_num = nodeList.index(joint_name)
@@ -715,8 +672,6 @@ def addGltfAnimation(gltfData, gltfDict):
                 joint_data = np.zeros(joint_data_orig.shape)
                 for j in range( joint_data_orig.shape[0] ):
                     joint_data[j,:] = quatmult(joint_data_orig[j,:], gltf_quat)
-                    if j==0 and joint_name=='Pelvis':
-                        print(joint_data[j,:])
                 
                 # Add joint data to buffer
                 joint_buffer, joint_buff_length = convertToBytes(joint_data)

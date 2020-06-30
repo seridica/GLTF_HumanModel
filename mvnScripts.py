@@ -54,7 +54,6 @@ def conversionTest():
     filename = 'D:/Google Drive/UBC Postdoc/Full Skeletal Rig/Xsens Files/summer_test1-001.mvnx'
     mvnx_data = etxml.parse(filename).getroot()
     
-    """
     ### SIMPLE MOCAP CONVERSION (NO SPINE CONSTRAINTS)
     # Get mvn parameters and create dictionary template
     mvnDict = mvnJointMap()
@@ -79,7 +78,7 @@ def conversionTest():
     
     # Convert back to mvn
     mvnConvert = gltf2mocap(mvnParams, gltfDict)
-    """
+    
     ### COMP{LEX MOCAP CONVERSION (NO SPINE CONSTRAINTS)
     mvnDict2 = mvnJointMap()
     mvnDict2['constraintMap'] = mvnConstraintMap()
@@ -97,19 +96,20 @@ def conversionTest():
     
     # Convert to gltf and save for reference
     gltfDict2 = mocap2gltf(mvnDict2)
-    #new_gltf = addGltfAnimation(curr_gltf, gltfDict2)
-    #new_gltf.save(new_fname)
+    curr_gltf = pygltf.GLTF2().load(filename)
+    new_gltf = addGltfAnimation(curr_gltf, gltfDict2)
+    new_gltf.save(new_fname)
     
     # Convert back to mvn
     mvnConvert2 = gltf2mocap(mvnParams2, gltfDict2)
     
-    #return mvnDict, gltfDict, mvnConvert, mvnDict2, gltfDict2, mvnConvert2
-    return mvnDict2, gltfDict2, mvnConvert2
+    return mvnDict, gltfDict, mvnConvert, mvnDict2, gltfDict2, mvnConvert2
+    #return mvnDict2, gltfDict2, mvnConvert2
 
 """
 Run sample code as a script
 """
 if __name__ == "__main__":
     #mvnDict, gltfDict, new_gltf = processMVN()
-    #mvnDict, gltfDict, mvnParams, mvnDict2, gltfDict2, mvnParams2 = conversionTest()
-    mvnDict2, gltfDict2, mvnParams2 = conversionTest()
+    mvnDict, gltfDict, mvnParams, mvnDict2, gltfDict2, mvnParams2 = conversionTest()
+    #mvnDict2, gltfDict2, mvnParams2 = conversionTest()

@@ -93,8 +93,8 @@ def UlnarRadialArmConstraint(constrMap, leftSide=True):
         
     # Parameters of the arm that set parameters for the constraint
     # Radius' are defined as positive distal and negative proximal
-    radius_r0 = 0.018
-    radius_r1 = 0.020
+    radius_r0 = 0.012
+    radius_r1 = 0.02
     
     ulna_r0 = 0.0
     ulna_r1 = 0.0
@@ -412,12 +412,13 @@ def CustomRadioUlnarThelp(in_dof, params):
     # Flexion-extension, pronation-supination, abduction-adduction
     
     tx = CosConstraint(-1*np.array(in_dof[1:2]), params[0:4])
-    tz = SinConstraint(-1*np.array(in_dof[1:2]), params[4:8])
+    tz = -SinConstraint(-1*np.array(in_dof[1:2]), params[4:8])
     t_ru = np.array([[tx],[0.],[tz]])
     
-    Rabd = np.array([[np.cos(in_dof[2]), -np.sin(in_dof[2]), 0.],[np.sin(in_dof[2]), np.cos(in_dof[2]), 0.],[0., 0., 1.]])
-    Rflex = np.array([[1., 0., 0.],[0., np.cos(-in_dof[0]), -np.sin(-in_dof[0])],[0., np.sin(-in_dof[0]), np.cos(-in_dof[0])]])
-    return np.matmul(Rflex, np.matmul(Rabd, t_ru))
+    #Rabd = np.array([[np.cos(-in_dof[2]), -np.sin(-in_dof[2]), 0.],[np.sin(-in_dof[2]), np.cos(-in_dof[2]), 0.],[0., 0., 1.]])
+    #Rax = np.array([[np.cos(-in_dof[1]), 0., np.sin(-in_dof[1])], [0., 1., 0.], [-np.sin(-in_dof[1]), 0., np.cos(in_dof[1])]])
+    #Rflex = np.array([[1., 0., 0.],[0., np.cos(-in_dof[0]), -np.sin(-in_dof[0])],[0., np.sin(-in_dof[0]), np.cos(-in_dof[0])]])
+    return t_ru #np.matmul(Rflex, np.matmul(Rabd, t_ru))
 
 def CustomRadioUlnarTX(in_dof, params):
     return CustomRadioUlnarThelp(in_dof,params)[0,0]
